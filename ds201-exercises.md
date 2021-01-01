@@ -2,7 +2,7 @@
 
 ### Exercise 1 - Install and Start Apache Cassandra™
 - To check the status of running Cassandra instance
-```
+```sh
 $ nodetool status
 Datacenter: datacenter1
 =======================
@@ -16,13 +16,13 @@ Note: Non-system keyspaces don't have the same replication settings, effective o
 
 ### Exercise 2 - CQL
 - Create a keyspace for KillrVideo
-```
+```sh
 cqlsh> CREATE KEYSPACE KillrVideo WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 cqlsh> DESC KEYSPACES ;
 ```
 
 - Create a table to store video metadata
-```
+```sh
 cqlsh> USE killrvideo ;
 cqlsh:killrvideo> CREATE TABLE videos ( video_id timeuuid, added_date timestamp, title text, primary key (video_id));
 cqlsh:killrvideo> DESC COLUMNFAMILIES ;
