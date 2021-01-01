@@ -156,3 +156,78 @@ cqlsh:killrvideo> SELECT * FROM videos_by_tag WHERE tag='cassandra';
 cqlsh:killrvideo> select * from videos_by_tag where title='Cassandra Intro';
 InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
 ```
+
+### Exercise 4 - Clustering Columns
+- Create table videos_by_tags to incorporate desc order by added_date
+```
+cqlsh:killrvideo> CREATE TABLE videos_by_tag ( tag text, video_id uuid, added_date timestamp, title text, PRIMARY KEY ((tag), added_date, video_id)) WITH CLUSTERING ORDER BY (added_date DESC);
+cqlsh:killrvideo> DESC videos_by_tag;
+
+CREATE TABLE killrvideo.videos_by_tag (
+    tag text,
+    added_date timestamp,
+    video_id uuid,
+    title text,
+    PRIMARY KEY (tag, added_date, video_id)
+) WITH CLUSTERING ORDER BY (added_date DESC, video_id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+```
+
+- Load data
+```
+cqlsh:killrvideo> COPY videos_by_tag(tag, video_id, added_date, title) FROM '/home/codingkapoor/Downloads/datastax/ds201-6.0-labwork/labwork/data-files/videos-by-tag.csv' WITH HEADER = true ;
+Using 3 child processes
+
+Starting copy of killrvideo.videos_by_tag with columns [tag, video_id, added_date, title].
+Processed: 5 rows; Rate:       8 rows/s; Avg. rate:      12 rows/s
+5 rows imported from 1 files in 0.414 seconds (0 skipped).
+cqlsh:killrvideo> SELECT * FROM videos_by_tag;
+
+ tag       | added_date                      | video_id                             | title
+-----------+---------------------------------+--------------------------------------+------------------------------
+  datastax | 2013-10-16 00:00:00.000000+0000 | 4845ed97-14bd-11e5-8a40-8338255b7e33 |              DataStax Studio
+  datastax | 2013-04-16 00:00:00.000000+0000 | 5645f8bd-14bd-11e5-af1a-8638355b8e3a | What is DataStax Enterprise?
+ cassandra | 2014-01-29 00:00:00.000000+0000 | 1645ea59-14bd-11e5-a993-8138354b7e31 |            Cassandra History
+ cassandra | 2013-03-17 00:00:00.000000+0000 | 3452f7de-14bd-11e5-855e-8738355b7e3a |              Cassandra Intro
+ cassandra | 2012-04-03 00:00:00.000000+0000 | 245e8024-14bd-11e5-9743-8238356b7e32 |             Cassandra & SSDs
+
+(5 rows)
+```
+
+- Query records ordered by date
+```
+cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' ORDER BY added_date;
+
+ tag       | added_date                      | title             | video_id
+-----------+---------------------------------+-------------------+--------------------------------------
+ cassandra | 2012-04-03 00:00:00.000000+0000 |  Cassandra & SSDs | 245e8024-14bd-11e5-9743-8238356b7e32
+ cassandra | 2013-03-17 00:00:00.000000+0000 |   Cassandra Intro | 3452f7de-14bd-11e5-855e-8738355b7e3a
+ cassandra | 2014-01-29 00:00:00.000000+0000 | Cassandra History | 1645ea59-14bd-11e5-a993-8138354b7e31
+
+(3 rows)
+```
+
+- Query records orered by date that are older than 2013
+```
+cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' and added_date >= '2013-01-01' ORDER BY added_date;
+
+ tag       | added_date                      | title             | video_id
+-----------+---------------------------------+-------------------+--------------------------------------
+ cassandra | 2013-03-17 00:00:00.000000+0000 |   Cassandra Intro | 3452f7de-14bd-11e5-855e-8738355b7e3a
+ cassandra | 2014-01-29 00:00:00.000000+0000 | Cassandra History | 1645ea59-14bd-11e5-a993-8138354b7e31
+
+(2 rows)
+```
