@@ -14,3 +14,55 @@ UN  127.0.0.1  795.3 KiB  256          ?       d5a70cb7-1fcf-49f2-9b04-20aa95924
 Note: Non-system keyspaces don't have the same replication settings, effective ownership information is meaningless
 ```
 
+### Exercise 2 - CQL
+- Create a keyspace for KillrVideo
+```
+cqlsh> CREATE KEYSPACE KillrVideo WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+cqlsh> DESC KEYSPACES ;
+```
+
+- Create a table to store video metadata
+```
+cqlsh> USE killrvideo ;
+cqlsh:killrvideo> CREATE TABLE videos ( video_id timeuuid, added_date timestamp, title text, primary key (video_id));
+cqlsh:killrvideo> DESC COLUMNFAMILIES ;
+
+cqlsh:killrvideo> DESC COLUMNFAMILY videos ;
+
+CREATE TABLE killrvideo.videos (
+    video_id timeuuid PRIMARY KEY,
+    added_date timestamp,
+    title text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:killrvideo> INSERT INTO videos (video_id, added_date, title) VALUES(1645ea59-14bd-11e5-a993-8138354b7e31, '2014-01-29', 'Cassandra History');
+cqlsh:killrvideo> SELECT * FROM videos;
+
+ video_id                             | added_date                      | title
+--------------------------------------+---------------------------------+-------------------
+ 1645ea59-14bd-11e5-a993-8138354b7e31 | 2014-01-29 00:00:00.000000+0000 | Cassandra History
+ 
+cqlsh:killrvideo> TRUNCATE videos;
+cqlsh:killrvideo> SELECT * FROM videos;
+
+ video_id | added_date | title
+----------+------------+-------
+```
+
+- Load the data for the video table from a CSV file
+```
+
+```
