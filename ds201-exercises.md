@@ -1,7 +1,7 @@
 ## DS201: DataStax Enterprise 6 Foundations of Apache Cassandra™
 
 ### Exercise 1 - Install and Start Apache Cassandra™
-- To check the status of running Cassandra instance
+#### To check the status of running Cassandra instance
 ```sh
 $ nodetool status
 Datacenter: datacenter1
@@ -15,13 +15,13 @@ Note: Non-system keyspaces don't have the same replication settings, effective o
 ```
 
 ### Exercise 2 - CQL
-- Create a keyspace for KillrVideo
+#### Create a keyspace for KillrVideo
 ```sh
 cqlsh> CREATE KEYSPACE KillrVideo WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 cqlsh> DESC KEYSPACES ;
 ```
 
-- Create a table to store video metadata
+#### Create a table to store video metadata
 ```sh
 cqlsh> USE killrvideo ;
 cqlsh:killrvideo> CREATE TABLE videos ( video_id timeuuid, added_date timestamp, title text, primary key (video_id));
@@ -62,7 +62,7 @@ cqlsh:killrvideo> SELECT * FROM videos;
 ----------+------------+-------
 ```
 
-- Load the data for the video table from a CSV file
+#### Load the data for the video table from a CSV file
 ```
 cqlsh:killrvideo> COPY videos(video_id, added_date, title) 
               ... FROM '/home/iamsmkr/Downloads/datastax/ds201-6.0-labwork/labwork/data-files/videos.csv'
@@ -95,7 +95,7 @@ cqlsh:killrvideo> SELECT TOKEN(video_id), video_id FROM videos;
 ```
 
 ### Exercise 3 – Partitions
-- Create table videos_by_tag to store video data categorised by tags
+#### Create table videos_by_tag to store video data categorised by tags
 ```
 cqlsh:killrvideo> CREATE TABLE videos_by_tag (video_id timeuuid, added_date timestamp, title text, tag text, primary key ((tag), video_id));
 cqlsh:killrvideo> DESC TABLE videos_by_tag ;
@@ -123,7 +123,7 @@ CREATE TABLE killrvideo.videos_by_tag (
     AND speculative_retry = '99PERCENTILE';
 ```
 
-- Load the data for the video table from a CSV file
+#### Load the data for the video table from a CSV file
 ```
 cqlsh:killrvideo> COPY videos_by_tag (tag, video_id, added_date, title) 
               ... FROM '/home/iamsmkr/Downloads/datastax/ds201-6.0-labwork/labwork/data-files/videos-by-tag.csv'
@@ -158,7 +158,7 @@ InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot exe
 ```
 
 ### Exercise 4 - Clustering Columns
-- Create table videos_by_tags to incorporate desc order by added_date
+#### Create table videos_by_tags to incorporate desc order by added_date
 ```
 cqlsh:killrvideo> CREATE TABLE videos_by_tag ( tag text, video_id uuid, added_date timestamp, title text, PRIMARY KEY ((tag), added_date, video_id)) WITH CLUSTERING ORDER BY (added_date DESC);
 cqlsh:killrvideo> DESC videos_by_tag;
@@ -186,7 +186,7 @@ CREATE TABLE killrvideo.videos_by_tag (
     AND speculative_retry = '99PERCENTILE';
 ```
 
-- Load data
+#### Load data
 ```
 cqlsh:killrvideo> COPY videos_by_tag(tag, video_id, added_date, title) FROM '/home/codingkapoor/Downloads/datastax/ds201-6.0-labwork/labwork/data-files/videos-by-tag.csv' WITH HEADER = true ;
 Using 3 child processes
@@ -207,7 +207,7 @@ cqlsh:killrvideo> SELECT * FROM videos_by_tag;
 (5 rows)
 ```
 
-- Query records ordered by date
+#### Query records ordered by date
 ```
 cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' ORDER BY added_date;
 
@@ -220,7 +220,7 @@ cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' ORDER BY add
 (3 rows)
 ```
 
-- Query records orered by date that are older than 2013
+#### Query records orered by date that are older than 2013
 ```
 cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' and added_date >= '2013-01-01' ORDER BY added_date;
 
