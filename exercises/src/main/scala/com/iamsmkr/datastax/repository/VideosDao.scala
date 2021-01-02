@@ -1,6 +1,5 @@
 package com.iamsmkr.datastax.repository
 
-import java.time.Instant
 import java.util.UUID
 
 import com.datastax.oss.driver.api.core.CqlSession
