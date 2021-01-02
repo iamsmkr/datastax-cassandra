@@ -4,16 +4,17 @@ import java.time.Instant
 import java.util.UUID
 
 import com.datastax.oss.driver.api.core.cql.Row
+import com.datastax.oss.driver.api.core.uuid.Uuids
 
-case class Videos(videoId: UUID, title: String, addedDate: Instant)
+case class Video(videoId: UUID = Uuids.timeBased(), title: String, addedDate: Instant = Instant.now())
 
-object Videos {
+object Video {
   final val TABLE_NAME = "videos"
 
   import Columns._
 
-  def getVideoFromRow(r: Row): Videos =
-    Videos(r.getUuid(VIDEO_ID), r.getString(TITLE), r.getInstant(ADDED_DATE))
+  def getVideoFromRow(r: Row): Video =
+    Video(r.getUuid(VIDEO_ID), r.getString(TITLE), r.getInstant(ADDED_DATE))
 
   object Columns {
     final lazy val VIDEO_ID = "video_id"

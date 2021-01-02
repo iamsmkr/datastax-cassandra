@@ -1,6 +1,7 @@
 package com.iamsmkr.datastax
 
 import com.datastax.oss.driver.api.core.CqlSession
+import com.iamsmkr.datastax.model.Video
 import com.iamsmkr.datastax.repository.{VideosByTagDao, VideosDao}
 
 import scala.util.Using
@@ -10,6 +11,9 @@ object KillrVideoApp extends App with CassConnector {
     val videosDao = VideosDao(session)
 
     videosDao.getAll.foreach(println)
+    println
+
+    println(videosDao.insert(Video(title = "Cassandra Awesome")))
     println
 
     val videosByTagDao = VideosByTagDao(session)
