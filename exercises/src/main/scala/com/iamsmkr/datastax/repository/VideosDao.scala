@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 import com.datastax.oss.driver.api.core.CqlSession
-import com.datastax.oss.driver.api.core.cql.SimpleStatement
+import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement, SimpleStatement}
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker
 import com.iamsmkr.datastax.model.Video
@@ -21,16 +21,28 @@ class VideosDao private(session: CqlSession) {
     rs.map(getVideoFromRow).all().asScala.toList
   }
 
-  def insert(video: Video): UUID = {
-    val stmt = session.prepare(INSERT_QUERY)
+  def getById(uuid: UUID): Video = {
+    val stmt = session.prepare(GET_BY_ID_QUERY).bind(uuid)
+    val row = session.execute(stmt).one()
+    getVideoFromRow(row)
+  }
 
-    val boundStmt = stmt.bind()
+  def insert(video: Video): UUID = {
+    val preparedStatement: PreparedStatement = session.prepare(INSERT_QUERY)
+
+    val boundStatement: BoundStatement = preparedStatement.bind()
       .setUuid(0, video.videoId)
       .setString(1, video.title)
       .setInstant(2, video.addedDate)
 
-    session.execute(boundStmt)
+    session.execute(boundStatement)
     video.videoId
+  }
+
+  def deleteById(uuid: UUID): UUID = {
+    val stmt = session.prepare(DELETE_QUERY).bind(uuid)
+    session.execute(stmt)
+    uuid
   }
 }
 
@@ -41,10 +53,19 @@ object VideosDao {
     final lazy val GET_ALL_QUERY: SimpleStatement =
       QueryBuilder.selectFrom(TABLE_NAME).all().build()
 
+    final lazy val GET_BY_ID_QUERY =
+      QueryBuilder.selectFrom(TABLE_NAME).all()
+        .whereColumn(VIDEO_ID).isEqualTo(bindMarker()).build()
+
     final lazy val INSERT_QUERY: SimpleStatement =
       QueryBuilder.insertInto(TABLE_NAME)
         .value(VIDEO_ID, bindMarker())
         .value(TITLE, bindMarker())
         .value(ADDED_DATE, bindMarker()).build()
+
+    final lazy val DELETE_QUERY: SimpleStatement =
+      QueryBuilder.deleteFrom(TABLE_NAME)
+        .whereColumn(VIDEO_ID).isEqualTo(bindMarker()).build()
   }
+
 }

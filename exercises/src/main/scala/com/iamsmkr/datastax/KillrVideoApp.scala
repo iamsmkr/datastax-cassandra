@@ -13,7 +13,14 @@ object KillrVideoApp extends App with CassConnector {
     videosDao.getAll.foreach(println)
     println
 
-    println(videosDao.insert(Video(title = "Cassandra Awesome")))
+    val video = Video(title = "Cassandra Awesome")
+    println(videosDao.insert(video))
+    println
+
+    println(videosDao.getById(video.videoId))
+    println
+
+    println(videosDao.deleteById(video.videoId))
     println
 
     val videosByTagDao = VideosByTagDao(session)
