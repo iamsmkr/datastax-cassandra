@@ -2,12 +2,16 @@ package com.iamsmkr.datastax
 
 import com.datastax.oss.driver.api.core.CqlSession
 import com.iamsmkr.datastax.model.Video
-import com.iamsmkr.datastax.repository.{VideosByTagDao, VideosDao}
+import com.iamsmkr.datastax.repository.{KillrVideoDao, VideosByTagDao, VideosDao}
 
 import scala.util.Using
 
-object KillrVideoApp extends App with CassConnector {
-  Using(getSession) { session: CqlSession =>
+object KillrVideoApp extends App {
+  implicit val config: CassConfig = CassConfig()
+
+  Using(CassConnector.getSession) { session: CqlSession =>
+    KillrVideoDao(session).useKeyspace
+
     val videosDao = VideosDao(session)
 
     videosDao.getAll.foreach(println)

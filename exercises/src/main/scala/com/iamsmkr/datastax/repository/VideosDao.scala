@@ -3,8 +3,9 @@ package com.iamsmkr.datastax.repository
 import java.util.UUID
 
 import com.datastax.oss.driver.api.core.CqlSession
+import com.datastax.oss.driver.api.core.`type`.DataTypes
 import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement, SimpleStatement}
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder
+import com.datastax.oss.driver.api.querybuilder.{QueryBuilder, SchemaBuilder}
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker
 import com.iamsmkr.datastax.model.Video
 import com.iamsmkr.datastax.model.Video.Columns._
@@ -14,6 +15,15 @@ import com.iamsmkr.datastax.repository.VideosDao.Queries._
 import scala.jdk.CollectionConverters._
 
 class VideosDao private(session: CqlSession) {
+
+  private def createTable(): Unit = {
+    val tbl = SchemaBuilder.createTable(TABLE_NAME).ifNotExists()
+      .withPartitionKey(VIDEO_ID, DataTypes.TIMEUUID)
+      .withColumn(TITLE, DataTypes.TEXT)
+      .withColumn(ADDED_DATE, DataTypes.TIMESTAMP)
+
+    session.execute(tbl.build())
+  }
 
   def getAll: List[Video] = {
     val rs = session.execute(GET_ALL_QUERY)
@@ -46,7 +56,11 @@ class VideosDao private(session: CqlSession) {
 }
 
 object VideosDao {
-  def apply(session: CqlSession): VideosDao = new VideosDao(session)
+  def apply(session: CqlSession): VideosDao = {
+    val videosDao = new VideosDao(session)
+    videosDao.createTable()
+    videosDao
+  }
 
   object Queries {
     final lazy val GET_ALL_QUERY: SimpleStatement =

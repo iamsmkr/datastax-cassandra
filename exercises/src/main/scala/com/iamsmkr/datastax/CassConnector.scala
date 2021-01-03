@@ -6,43 +6,21 @@ import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.CqlSessionBuilder
 import scala.jdk.CollectionConverters._
 
-import com.typesafe.config.ConfigFactory
-
-case class CassConfig private(datacenter: String, nodes: Seq[String], port: Int, keyspace: String)
-
-object CassConfig {
-
-  import scala.jdk.CollectionConverters._
-
-  private val config = ConfigFactory.load()
-
-  def apply(): CassConfig = {
-    CassConfig(
-      config.getString("cassandra.datacenter"),
-      config.getStringList("cassandra.host").asScala.toSeq,
-      config.getInt("cassandra.port"),
-      config.getString("cassandra.keyspace")
-    )
-  }
-}
-
-trait CassConnector {
-  private val config: CassConfig = CassConfig()
+object CassConnector {
   private var session: Option[CqlSession] = None
 
-  private def connect(): Unit = {
+  private def connect(config: CassConfig): Unit = {
     val builder: CqlSessionBuilder = CqlSession.builder()
     builder.addContactPoints(config.nodes.map(n => new InetSocketAddress(n, config.port)).asJavaCollection)
       .withLocalDatacenter(config.datacenter)
-      .withKeyspace(config.keyspace)
 
     session = Some(builder.build())
   }
 
-  def getSession: CqlSession = {
+  def getSession(implicit cassConfig: CassConfig): CqlSession = {
     if (session.isDefined) this.session.get
     else {
-      connect()
+      connect(cassConfig)
       this.session.get
     }
   }
