@@ -236,3 +236,33 @@ cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' and added_da
 https://github.com/iamsmkr/datastax-cassandra/tree/main/exercises
 
 ### Exercise 6 - Node
+- Execute nodetool with the `help` command to list all possible commands
+```
+$ nodetool help
+
+usage: nodetool [(-u <username> | --username <username>)]
+        [(-pw <password> | --password <password>)] [(-h <host> | --host <host>)]
+        [(-p <port> | --port <port>)]
+        [(-pwf <passwordFilePath> | --password-file <passwordFilePath>)] <command>
+        [<args>]
+
+The most commonly used nodetool commands are:
+    assassinate                  Forcefully remove a dead node without re-replicating any data.  Use as a last resort if you cannot removenode
+    bootstrap                    Monitor/manage node's bootstrap process
+    cleanup                      Triggers the immediate cleanup of keys no longer belonging to a node. By default, clean all keyspaces
+    clearsnapshot                Remove the snapshot with the given name from the given keyspaces. If no snapshotName is specified we will remove all snapshots
+    compact                      Force a (major) compaction on one or more tables or user-defined compaction on given SSTables
+...
+```
+
+- The status command shows information about the entire cluster, particularly the state of each node, and information about each of those nodes: IP address, data load, number of tokens,  total percentage of data saved on each node, host ID, and datacenter and rack.
+```
+$ nodetool status
+
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address    Load       Tokens       Owns    Host ID                               Rack
+UN  127.0.0.1  784.5 KiB  256          ?       d5a70cb7-1fcf-49f2-9b04-20aa95924976  rack1
+```
