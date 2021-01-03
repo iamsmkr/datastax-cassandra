@@ -231,3 +231,8 @@ cqlsh:killrvideo> select * from videos_by_tag where tag='cassandra' and added_da
 
 (2 rows)
 ```
+
+### Exercise 5 - Drivers
+https://github.com/iamsmkr/datastax-cassandra/tree/main/exercises
+
+### Exercise 6 - Node
