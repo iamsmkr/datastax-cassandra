@@ -239,7 +239,6 @@ https://github.com/iamsmkr/datastax-cassandra/tree/main/exercises
 - Execute nodetool with the `help` command to list all possible commands
 ```
 $ nodetool help
-
 usage: nodetool [(-u <username> | --username <username>)]
         [(-pw <password> | --password <password>)] [(-h <host> | --host <host>)]
         [(-p <port> | --port <port>)]
@@ -258,7 +257,6 @@ The most commonly used nodetool commands are:
 - The `status` command shows information about the entire cluster, particularly the state of each node, and information about each of those nodes: IP address, data load, number of tokens,  total percentage of data saved on each node, host ID, and datacenter and rack.
 ```
 $ nodetool status
-
 Datacenter: datacenter1
 =======================
 Status=Up/Down
@@ -270,7 +268,6 @@ UN  127.0.0.1  784.5 KiB  256          ?       d5a70cb7-1fcf-49f2-9b04-20aa95924
 - The `info` command displays information about the connected node, which includes token information, host ID, protocol status, data load, node uptime, heap memory usage and capacity, datacenter and rack information, number of errors reported, cache usage, and percentage of SSTables that have been incrementally repaired.
 ```
 $ nodetool info
-
 ID                     : d5a70cb7-1fcf-49f2-9b04-20aa95924976
 Gossip active          : true
 Thrift active          : false
@@ -294,7 +291,6 @@ Token                  : (invoke with -T/--tokens to see all 256 tokens)
 - The `describecluster` shows the settings that are common across all of the nodes in the cluster and the current schema version used by each node.
 ```
 $ nodetool describecluster
-
 Cluster Information:
 	Name: Test Cluster
 	Snitch: org.apache.cassandra.locator.SimpleSnitch
@@ -307,8 +303,8 @@ Cluster Information:
 - The command `setlogginglevel` dynamically changes the logging level used by Apache Cassandra™ without the need for a restart. You can also look at the `/var/log/cassandra/system.log` afterwards to observe the changes.
 ```
 $ nodetool setlogginglevel org.apache.cassandra TRACE
-$ nodetool getlogginglevels
 
+$ nodetool getlogginglevels
 Logger Name                                        Log Level
 ROOT                                                    INFO
 com.thinkaurelius.thrift                               ERROR
@@ -320,7 +316,6 @@ org.apache.cassandra                                   TRACE
 $ nodetool settraceprobability 0.1
 
 $ nodetool gettraceprobability
-
 Current trace probability: 0.1
 ```
 
