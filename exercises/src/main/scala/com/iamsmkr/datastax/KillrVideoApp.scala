@@ -6,14 +6,8 @@ import com.iamsmkr.datastax.repository.{KillrVideoDao, VideosByTagDao, VideosDao
 
 import scala.util.Using
 
-object KillrVideoApp extends App {
-  implicit val config: CassConfig = CassConfig()
-
-  Using(CassConnector.getSession) { session: CqlSession =>
-    KillrVideoDao(session).useKeyspace
-
-    val videosDao = VideosDao(session)
-
+class KillrVideoApp(videosDao: VideosDao, videosByTagDao: VideosByTagDao) {
+  def readWriteCass(implicit cassConfig: CassConfig): Unit = {
     videosDao.getAll.foreach(println)
     println
 
@@ -27,12 +21,28 @@ object KillrVideoApp extends App {
     println(videosDao.deleteById(video.videoId))
     println
 
-    val videosByTagDao = VideosByTagDao(session)
-
     videosByTagDao.getAll.foreach(println)
     println
 
     videosByTagDao.getByTag("datastax").foreach(println)
     println
   }
+}
+
+object KillrVideoApp {
+  def main(args: Array[String]): Unit = {
+    implicit val config: CassConfig = CassConfig()
+
+    Using(CassConnector.getSession) { session: CqlSession =>
+      KillrVideoDao(session)
+
+      val killrVideoApp = new KillrVideoApp(
+        VideosDao(session),
+        VideosByTagDao(session)
+      )
+      killrVideoApp.readWriteCass
+
+    }
+  }
+
 }

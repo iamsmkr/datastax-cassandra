@@ -14,7 +14,7 @@ class KillrVideoDao private(session: CqlSession) {
     session.execute(ks.build())
   }
 
-  def useKeyspace(implicit config: CassConfig): ResultSet = {
+  private def useKeyspace(implicit config: CassConfig): ResultSet = {
     session.execute("USE " + CqlIdentifier.fromCql(config.keyspace))
   }
 
@@ -24,6 +24,7 @@ object KillrVideoDao {
   def apply(session: CqlSession)(implicit cassConfig: CassConfig): KillrVideoDao = {
     val killrVideoDao = new KillrVideoDao(session)
     killrVideoDao.createKeyspace
+    killrVideoDao.useKeyspace
     killrVideoDao
   }
 }
