@@ -332,4 +332,9 @@ https://github.com/iamsmkr/datastax-cassandra/tree/main/exercises
 	/opt/cassandra/current/bin cassandra
 	```
 
-- 
+- We can stress the node using a simple tool called Apache Cassandra(TM) Stress, like so:
+	```
+	$ /opt/cassandra/current/tools/bin/cassandra-stress write n=50000 no-warmup -rate threads=1
+	```
+
+Initially, we will see a long list of setting for the stress run. As Apache Cassandra™ stress executes, it logs several statistics to the terminal. Each line displays the statistics for the operations that occurred each second and shows number of partitions written, operations per second, latency information, and more.
