@@ -337,4 +337,13 @@ https://github.com/iamsmkr/datastax-cassandra/tree/main/exercises
 	$ /opt/cassandra/current/tools/bin/cassandra-stress write n=50000 no-warmup -rate threads=1
 	```
 
-Initially, we will see a long list of setting for the stress run. As Apache Cassandra™ stress executes, it logs several statistics to the terminal. Each line displays the statistics for the operations that occurred each second and shows number of partitions written, operations per second, latency information, and more.
+	Initially, we will see a long list of setting for the stress run. As Apache Cassandra™ stress executes, it logs several statistics to the terminal. Each line displays the statistics for the operations that occurred each second and shows number of partitions written, operations per second, latency information, and more.
+	 Now with the `flush` command commits all written (memtable, discussed later) data to disk. Unlike drain, flush allows further writes to occur.
+	```
+	$ /opt/cassandra/current/bin/nodetool flush
+	```
+	
+	Next we can examine the data cassandra-stress wrote to our node.
+	```
+	cqsh> SELECT * FROM keyspace1.standard1 LIMIT 5;
+	```
