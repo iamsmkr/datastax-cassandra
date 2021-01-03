@@ -40,8 +40,8 @@ object KillrVideoApp {
         VideosDao(session),
         VideosByTagDao(session)
       )
-      killrVideoApp.readWriteCass
 
+      killrVideoApp.readWriteCass
     }
   }
 
